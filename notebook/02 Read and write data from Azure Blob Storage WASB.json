@@ -4,6 +4,10 @@
 		"folder": {
 			"name": "Sample"
 		},
+		"bigDataPool": {
+			"referenceName": "pmtSparkSmall",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -20,10 +24,25 @@
 			"saveOutput": true,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/9eb93167-f550-49e6-a443-cfd940efdb45/resourceGroups/demo/providers/Microsoft.Synapse/workspaces/synapseai/bigDataPools/pmtSparkSmall",
+				"name": "pmtSparkSmall",
+				"type": "Spark",
+				"endpoint": "https://synapseai.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/pmtSparkSmall",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "2.4",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -63,7 +82,7 @@
 					"hol = PublicHolidays(start_date=start_date, end_date=end_date)\n",
 					"hol_df = hol.to_spark_dataframe()"
 				],
-				"execution_count": 3
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -71,7 +90,7 @@
 					"# Display 5 rows\n",
 					"hol_df.show(5, truncate = False)"
 				],
-				"execution_count": 4
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -105,14 +124,14 @@
 					"from pyspark.sql.types import *\n",
 					"\n",
 					"# Azure storage access info\n",
-					"blob_account_name = 'Your blob name' # replace with your blob name\n",
-					"blob_container_name = 'Your container name' # replace with your container name\n",
-					"blob_relative_path = 'Your relative path' # replace with your relative folder path\n",
-					"linked_service_name = 'Your linked service name' # replace with your linked service name\n",
+					"blob_account_name = 'wesynapseadls' # replace with your blob name\n",
+					"blob_container_name = 'wesynapsefs' # replace with your container name\n",
+					"blob_relative_path = 'sample/' # replace with your relative folder path\n",
+					"linked_service_name = 'azurebloblink' # replace with your linked service name\n",
 					"\n",
 					"blob_sas_token = mssparkutils.credentials.getConnectionStringOrCreds(linked_service_name)"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
