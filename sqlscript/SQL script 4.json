@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 4",
+	"properties": {
+		"content": {
+			"query": "SELECT \n    json_query(jsonContent, '$.devices[0]') as devices,\n    jsonContent\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/netatmo/*.json',\n        FORMAT='CSV',\n        FIELDTERMINATOR ='0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        jsonContent varchar(8000)\n    ) AS [r]\n\n\n\nSELECT TOP 100\n    --json_value(jsonContent, '$.user.mail') as mail,\n    json_value(jsoncontent, '$.devices[0]._id') as id,\n    json_value(jsoncontent, '$.devices[0].station_name') as station,\n    DATEADD(SS, CONVERT(BIGINT, json_value(jsoncontent, '$.devices[0].dashboard_data.time_utc')), '19700101') as Time_UTC,\n    json_value(jsoncontent, '$.devices[0].dashboard_data.Temperature') as temperature,\n    json_value(jsoncontent, '$.devices[0].modules[0].dashboard_data.Temperature') as outside,\n    json_value(jsoncontent, '$.devices[0].dashboard_data.Humidity') as Humidity,\n    json_value(jsoncontent, '$.devices[0].dashboard_data.Pressure') as Pressure,\n    json_value(jsoncontent, '$.devices[0].dashboard_data.temp_trend') as trend,\n    jsonContent\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.blob.core.windows.net/wesynapsefs/netatmo/*.json',\n        FORMAT='CSV',\n        FIELDTERMINATOR ='0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        jsonContent varchar(8000)\n    ) AS [r]\nwhere jsonContent <> 'null'\n--order by Time_UTC desc\n--WHERE JSON_VALUE(jsonContent, '$.title') = 'Probabilistic and Statistical Methods in Cryptology, An Introduction by Selected Topics';\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "Built-in",
+				"databaseName": "master"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

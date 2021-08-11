@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 10",
+	"properties": {
+		"content": {
+			"query": "SELECT TOP (100) [id]\n,[productID]\n,[productCategory]\n,[brand]\n,[name]\n,[price]\n,[imageURL]\n,[description]\n,[updated_ts]\n FROM [dbo].[product_detail]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "SQLPOOL02",
+				"databaseName": "SQLPOOL02"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,138 @@
+{
+	"name": "04_RecommendationRefresh",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool1",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2
+		},
+		"metadata": {
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/9eb93167-f550-49e6-a443-cfd940efdb45/resourceGroups/demo/providers/Microsoft.Synapse/workspaces/synapseai/bigDataPools/SparkPool1",
+				"name": "SparkPool1",
+				"type": "Spark",
+				"endpoint": "https://synapseai.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool1",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "2.4",
+				"nodeCount": 3,
+				"cores": 8,
+				"memory": 56
+			}
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"source": [
+					"Copyright (c) Microsoft Corporation. \n",
+					"Licensed under the MIT license. \n",
+					"## Recommendation Refresh\n",
+					"---\n",
+					"This script uses the trained ALS model to compute recommendations for targeted users who have new data or signals since the last run of the script.  \n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.ml.recommendation import ALSModel\n",
+					"from pyspark.ml.recommendation import ALS\n",
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.types import *\n",
+					"from pyspark.sql.functions import *\n",
+					"from pyspark.ml.feature import  StringIndexer, IndexToString"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"try:\n",
+					"    spark.sql(\"CREATE DATABASE retailaidb\")\n",
+					"except:\n",
+					"    print(\"Database already exists\")"
+				],
+				"attachments": null,
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"model_reload = ALSModel.load(\"retailai_recommendation_model\")"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"get_top_users = spark.read.table(\"retailaidb.cleaned_dataset\").groupBy([\"user_id\", \"user_session\"]).count().groupBy([\"user_id\"]).count().orderBy(\"count\", ascending=False)"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"top_user_ids = get_top_users.select(\"user_id\").limit(10)"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#top_user_ids.show()"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"preds_alt = model_reload.recommendForUserSubset(top_user_ids, 5).select(\"user_id\", col(\"recommendations\"))"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"user_preds_df = preds_alt.select(\"user_id\",explode(\"recommendations\").alias(\"recommendations\")) \\\n",
+					"                                    .select(\"user_id\", \"recommendations.product_id\", \"recommendations.rating\").orderBy(\"rating\", ascending=False)"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"final_recommendations = get_prod_data_df.groupBy(\"user_id\").agg(collect_set(\"product_id\").alias(\"product_ids\")) \\\n",
+					"                                                    .select(\"user_id\", col(\"product_ids\").cast(\"string\"))"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"final_recommendations.withColumn(\"updated_ts\", lit(current_timestamp()).cast(\"timestamp\")) \\\n",
+					"                                    .select(col(\"user_id\").cast(\"string\").alias(\"user_id\"), \"product_ids\", \"updated_ts\") \\\n",
+					"                                    .write.saveAsTable(\"retailaidb.top_shopper_recommendation_summary\", mode=\"overwrite\")"
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"source": [],
+				"execution_count": null
+			}
+		]
+	}
+}

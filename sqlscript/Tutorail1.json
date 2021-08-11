@@ -1,0 +1,17 @@
+{
+	"name": "Tutorail1",
+	"properties": {
+		"content": {
+			"query": "SELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/tutorial/NYCTripSmall.parquet',\n        FORMAT='PARQUET'\n    ) AS [result]\n\nCREATE DATABASE DataExplorationDB \n                COLLATE Latin1_General_100_BIN2_UTF8\n\nCREATE EXTERNAL DATA SOURCE ContosoLake\nWITH ( LOCATION = 'https://wesynapseadls.dfs.core.windows.net')\n\nCREATE LOGIN data_explorer WITH PASSWORD = 'My Very Strong Password 1234!';\n\nCREATE USER data_explorer FOR LOGIN data_explorer;\nGO\nGRANT ADMINISTER DATABASE BULK OPERATIONS TO data_explorer;\nGO\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n            BULK '/wesynapsefs/tutorial/NYCTripSmall.parquet',\n            DATA_SOURCE = 'ContosoLake',\n            FORMAT='PARQUET'\n    ) AS [result]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "Built-in",
+				"databaseName": "DataExplorationDB"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "SELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/synapseai/warehouse/full_dataset/part-00001-099d55af-20ec-46df-b983-7efa90bdeb69-c000.snappy.parquet',\n        FORMAT='PARQUET'\n    ) AS [r];\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"name": "master",
+				"type": "SqlOnDemand"
+			}
+		},
+		"type": "SqlQuery"
+	}
+}

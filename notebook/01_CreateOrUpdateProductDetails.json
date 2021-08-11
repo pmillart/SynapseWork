@@ -1,0 +1,79 @@
+{
+	"name": "01_CreateOrUpdateProductDetails",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool1",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2
+		},
+		"metadata": {
+			"kernelspec": {
+				"name": "python3",
+				"display_name": "Python 3"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/9eb93167-f550-49e6-a443-cfd940efdb45/resourceGroups/demo/providers/Microsoft.Synapse/workspaces/synapseai/bigDataPools/SparkPool1",
+				"name": "SparkPool1",
+				"type": "Spark",
+				"endpoint": "https://synapseai.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool1",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "2.4",
+				"nodeCount": 3,
+				"cores": 8,
+				"memory": 56
+			}
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"source": [
+					"Copyright (c) Microsoft Corporation. \n",
+					"Licensed under the MIT license. \n",
+					"In the Synapse-AI-Retail-Recommender, there are instructions for uploading the Product Detail JSON to the ADLS Gen2 Account that is attached to your Synapse Studio  \n",
+					"  \n",
+					"This script reads the Product Details JSON and creates a product table to be indexed and made queryable by the API Layer for adding in extra details about the products like images and cleaned up names. "
+				],
+				"attachments": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import *\n",
+					"\n",
+					"# name of the Data Lake Storage Account\n",
+					"DATA_LAKE_ACCOUNT_NAME = \"wesynapseadls\"\n",
+					"# name of the filesystem that was chosen to be the primary filesystem\n",
+					"FILE_SYSTEM_NAME = \"wesynapsefs\"\n",
+					"\n",
+					"data_path = spark.read.load(f\"abfss://{FILE_SYSTEM_NAME}@{DATA_LAKE_ACCOUNT_NAME}.dfs.core.windows.net/synapse/workspaces/product_detail.json\", format='json', multiline=True)\n",
+					"df = data_path.select(explode(col(\"products\")).alias(\"products\")) \\\n",
+					"                .select(\"products.*\", lit(current_timestamp()).cast(\"timestamp\").alias(\"updated_ts\")) \\\n",
+					"                .select(\"id\", \"productID\", \"productCategory\", \"brand\", \"name\", \"price\", \"imageURL\", \"description\", \"updated_ts\")\n",
+					"\n",
+					"try:\n",
+					"    spark.sql(\"CREATE DATABASE retailaidb\")\n",
+					"except:\n",
+					"    print(\"Database already exists\")\n",
+					"\n",
+					"\n",
+					"df.write.saveAsTable(\"retailaidb.product_detail\", mode=\"overwrite\")"
+				],
+				"execution_count": 3
+			}
+		]
+	}
+}

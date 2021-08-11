@@ -1,0 +1,296 @@
+{
+	"name": "02_Clean_Training_Data",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool1",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2
+		},
+		"metadata": {
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/9eb93167-f550-49e6-a443-cfd940efdb45/resourceGroups/demo/providers/Microsoft.Synapse/workspaces/synapseai/bigDataPools/SparkPool1",
+				"name": "SparkPool1",
+				"type": "Spark",
+				"endpoint": "https://synapseai.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool1",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "2.4",
+				"nodeCount": 3,
+				"cores": 8,
+				"memory": 56
+			}
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"source": [
+					"Copyright (c) Microsoft Corporation. \n",
+					"Licensed under the MIT license. \n",
+					"## Clean Training Data \n",
+					"This notebook will clean the training dataset and load the cleaned data into a spark database for training the models. \n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"DATA_LAKE_ACCOUNT_NAME = \"wesynapseadls\"\n",
+					"FILE_SYSTEM_NAME = \"wesynapsefs\""
+				],
+				"attachments": null,
+				"execution_count": 73
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = spark.read.load(f\"abfss://{FILE_SYSTEM_NAME}@{DATA_LAKE_ACCOUNT_NAME}.dfs.core.windows.net/synapse/workspaces/2019-Oct.csv\", format=\"csv\", header = True)\n",
+					"df1 = spark.read.load(f\"abfss://{FILE_SYSTEM_NAME}@{DATA_LAKE_ACCOUNT_NAME}.dfs.core.windows.net/synapse/workspaces/2019-Nov.csv\", format=\"csv\", header = True)\n",
+					"df2 = spark.read.load(f\"abfss://{FILE_SYSTEM_NAME}@{DATA_LAKE_ACCOUNT_NAME}.dfs.core.windows.net/synapse/workspaces/2019-Dec.csv.gz\", format=\"csv\", header = True)\n",
+					"df3 = spark.read.load(f\"abfss://{FILE_SYSTEM_NAME}@{DATA_LAKE_ACCOUNT_NAME}.dfs.core.windows.net/synapse/workspaces/2020-Jan.csv.gz\", format=\"csv\", header = True)\n",
+					"df = df.union(df1)\n",
+					"df = df.union(df2)\n",
+					"df = df.union(df3)\n",
+					"df.write.saveAsTable(\"full_dataset\", mode=\"overwrite\", format=\"delta\")"
+				],
+				"attachments": null,
+				"execution_count": 74
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#full_dataset = spark.read.format(\"delta\").load(f\"abfss://{FILE_SYSTEM_NAME}@{DATA_LAKE_ACCOUNT_NAME}.dfs.core.windows.net/synapse/workspaces/full_dataset/\")\n",
+					"full_dataset = spark.read.format(\"delta\").load(f\"abfss://{FILE_SYSTEM_NAME}@{DATA_LAKE_ACCOUNT_NAME}.dfs.core.windows.net/synapse/workspaces/synapseai/warehouse/full_dataset/\")"
+				],
+				"execution_count": 75
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# remove all null values from category and brand\n",
+					"filtered_df = full_dataset.filter((full_dataset.category_code != 'null') & (full_dataset.brand != 'null'))"
+				],
+				"execution_count": 76
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filter on construction and remove misplaced brands \n",
+					"construction_df = filtered_df.filter((filtered_df.category_code.contains('construction')) & (filtered_df.brand != 'apple') & (filtered_df.brand != 'philips') & (filtered_df.brand != 'oystercosmetics')& (filtered_df.brand != 'tefal') & (filtered_df.brand != 'hyundai') & (filtered_df.brand != 'polaris') & (filtered_df.brand != 'puma') & (filtered_df.brand != 'samsung') & (filtered_df.brand != 'maybellinenewyork') & (filtered_df.brand != 'lg') & (filtered_df.brand != 'sony') & (filtered_df.brand != 'nokia') & (filtered_df.brand != 'nike') & (filtered_df.brand != 'fila') & (filtered_df.brand != 'milanicosmetics') & (filtered_df.brand != 'shoesrepublic') &(filtered_df.brand != 'hp')&(filtered_df.brand != 'jbl'))"
+				],
+				"execution_count": 77
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filter on electronics and remove misplaced brands \n",
+					"electronic_df = filtered_df.filter((filtered_df.category_code.contains('electronics'))& (filtered_df.brand != 'houseofseasons') & (filtered_df.brand != 'jaguar') & (filtered_df.brand != 'shoesrepublic') & (filtered_df.brand != 'tefal') & (filtered_df.brand != 'nike') & (filtered_df.brand != 'hyundai') & (filtered_df.brand != 'puma'))"
+				],
+				"execution_count": 78
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filter on apparel and remove misplaced brands\n",
+					"apparel_df = filtered_df.filter((filtered_df.category_code.contains('apparel')) & (filtered_df.brand != 'toyota')  & (filtered_df.brand != 'canon')& (filtered_df.brand != 'samsung')  & (filtered_df.brand != 'hp')& (filtered_df.brand != 'nikon') & (filtered_df.brand != 'jbl') & (filtered_df.brand != 'apple') & (filtered_df.brand != 'x-digital') & (filtered_df.brand != 'tefal') & (filtered_df.brand != 'fujifilm') & (filtered_df.brand != 'toysmax') & (filtered_df.brand != 'houseofseasons') & (filtered_df.brand != 'toshiba') & (filtered_df.brand != 'playdoh') & (filtered_df.brand != 'jaguar') & (filtered_df.brand != 'microsoft') & (filtered_df.brand != 'tv-shop') & (filtered_df.brand != 'xp-pen') & (filtered_df.brand != 'philips') & (filtered_df.brand != 'logitech') & (filtered_df.brand != 'm-audio') & (filtered_df.brand != 'sony') & (filtered_df.brand != 'lg') & (filtered_df.brand != 'hyundai'))"
+				],
+				"execution_count": 79
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on computers and removed misplaced brands\n",
+					"computer_df = filtered_df.filter((filtered_df.category_code.contains('computers')) & (filtered_df.brand != 'fila') & (filtered_df.brand != 'moosetoys') & (filtered_df.brand != 'tefal') & (filtered_df.brand != 'hotwheels') & (filtered_df.brand != 'taftoys') & (filtered_df.brand != 'barbi') & (filtered_df.brand != 'fitbit') & (filtered_df.brand != 'nike'))"
+				],
+				"execution_count": 80
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on appliances and removed misplaced brands\n",
+					"appliance_df = filtered_df.filter((filtered_df.category_code.contains('appliances')) & (filtered_df.brand != 'fila')& (filtered_df.brand != 'shoesrepublic') & (filtered_df.brand != 'toshiba')& (filtered_df.brand != 'hp')& (filtered_df.brand != 'nokia')&(filtered_df.brand != 'hyundai')& (filtered_df.brand != 'moosetoys') & (filtered_df.brand != 'jaguar') & (filtered_df.brand != 'colorkid') & (filtered_df.brand != 'apple') & (filtered_df.brand != 'jbl') & (filtered_df.brand != 'toyota') & (filtered_df.brand != 'nike') & (filtered_df.brand != 'logitech'))"
+				],
+				"execution_count": 81
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on auto and removed misplaced brands\n",
+					"auto_df = filtered_df.filter((filtered_df.category_code.contains('auto')) & (filtered_df.brand != 'philips')& (filtered_df.brand != 'sony') & (filtered_df.brand != 'toshiba') & (filtered_df.brand != 'fujifilm') & (filtered_df.brand != 'nikon') & (filtered_df.brand != 'canon') & (filtered_df.brand != 'samsung') & (filtered_df.brand != 'hp'))"
+				],
+				"execution_count": 82
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on furniture and removed misplaced brands\n",
+					"furniture_df = filtered_df.filter((filtered_df.category_code.contains('furniture')) & (filtered_df.brand != 'philips')& (filtered_df.brand != 'lg')& (filtered_df.brand != 'samsung') & (filtered_df.brand != 'hyundai')& (filtered_df.brand != 'sony') & (filtered_df.brand != 'logitech') & (filtered_df.brand != 'microsoft') & (filtered_df.brand != 'toshiba') & (filtered_df.brand != 'fujifilm') & (filtered_df.brand != 'tefal') & (filtered_df.brand != 'apple') & (filtered_df.brand != 'nikon') & (filtered_df.brand != 'dell') & (filtered_df.brand != 'nike') & (filtered_df.brand != 'newsuntoys') & (filtered_df.brand != 'canon') & (filtered_df.brand != 'puma') & (filtered_df.brand != 'hp') )"
+				],
+				"execution_count": 83
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on kids and removed misplaced brands\n",
+					"kids_df = filtered_df.filter((filtered_df.category_code.contains('kids')) & (filtered_df.brand != 'tefal')& (filtered_df.brand != 'puma') & (filtered_df.brand != 'hp') & (filtered_df.brand != 'apple') & (filtered_df.brand != 'nike') & (filtered_df.brand != 'canon') & (filtered_df.brand != 'lg') & (filtered_df.brand != 'sony') & (filtered_df.brand != 'samsung'))"
+				],
+				"execution_count": 84
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on sports and removed misplaced brands\n",
+					"sports_df = filtered_df.filter((filtered_df.category_code.contains('sport')) & (filtered_df.brand != 'philips')& (filtered_df.brand != 'hp') & (filtered_df.brand != 'canon') & (filtered_df.brand != 'logitech') & (filtered_df.brand != 'microsoft') & (filtered_df.brand != 'apple') & (filtered_df.brand != 'jbl') & (filtered_df.brand != 'nikon') & (filtered_df.brand != 'mersedes-benz') & (filtered_df.brand != 'toyland') & (filtered_df.brand != 'lg') & (filtered_df.brand != 'samsung') & (filtered_df.brand != 'ikea') & (filtered_df.brand != 'logitech') & (filtered_df.brand != 'bmw') & (filtered_df.brand != 'jeep') & (filtered_df.brand != 'sony') & (filtered_df.brand != 'asus') & (filtered_df.brand != 'hyundai'))"
+				],
+				"execution_count": 85
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on country_yard and removed misplaced brands\n",
+					"country_df = filtered_df.filter((filtered_df.category_code.contains('country_yard')) & (filtered_df.brand != 'nike')& (filtered_df.brand != 'samsung') & (filtered_df.brand != 'sony') & (filtered_df.brand != 'vans') & (filtered_df.brand != 'hyundai') & (filtered_df.brand != 'puma') & (filtered_df.brand != 'columbia') & (filtered_df.brand != 'adidas')& (filtered_df.brand != 'apple'))"
+				],
+				"execution_count": 86
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on stationary and removed misplaced brands\n",
+					"stationery_df = filtered_df.filter((filtered_df.category_code.contains('stationery')) & (filtered_df.brand !='hyundai') & (filtered_df.brand !='puma')  & (filtered_df.brand !='nike') & (filtered_df.brand !='jeep') & (filtered_df.brand !='jaguar') & (filtered_df.brand !='toyota') & (filtered_df.brand !='shoesrepublic') & (filtered_df.brand !='tefal')  & (filtered_df.brand !='fila'))"
+				],
+				"execution_count": 87
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#filtered on accessories and removed misplaced brands\n",
+					"accessories_df = filtered_df.filter((filtered_df.category_code == 'accessories.umbrella') |(filtered_df.category_code == 'accessories.wallet') |(filtered_df.category_code == 'accessories.bag') &(filtered_df.brand != 'hyundai'))"
+				],
+				"execution_count": 88
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"medicine_df = filtered_df.filter((filtered_df.category_code.contains('medicine')) & (filtered_df.brand != 'ikea'))"
+				],
+				"execution_count": 89
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# combine all the separated DataFrames into one to load into a table. \n",
+					"df = medicine_df.union(accessories_df)"
+				],
+				"execution_count": 90
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(stationery_df)"
+				],
+				"execution_count": 91
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(country_df)"
+				],
+				"execution_count": 92
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(sports_df)"
+				],
+				"execution_count": 93
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(kids_df)"
+				],
+				"execution_count": 94
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(furniture_df)"
+				],
+				"execution_count": 95
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(auto_df)"
+				],
+				"execution_count": 96
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(appliance_df)"
+				],
+				"execution_count": 97
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(computer_df) "
+				],
+				"execution_count": 98
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(apparel_df)"
+				],
+				"execution_count": 99
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(electronic_df)"
+				],
+				"execution_count": 100
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = df.union(construction_df)"
+				],
+				"execution_count": 101
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# load the cleaned data to a spark database \n",
+					"try:\n",
+					"    spark.sql(\"CREATE DATABASE retailaidb\")\n",
+					"except:\n",
+					"    print(\"Database already exists\")\n",
+					"df.write.saveAsTable(\"retailaidb.cleaned_dataset\")"
+				],
+				"execution_count": 102
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#df.write.saveAsTable(\"retailaidb.cleaned_dataset\")"
+				],
+				"execution_count": 3
+			}
+		]
+	}
+}

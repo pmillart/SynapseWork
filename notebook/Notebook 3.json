@@ -1,0 +1,49 @@
+{
+	"name": "Notebook 3",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPool1",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2
+		},
+		"metadata": {
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/9eb93167-f550-49e6-a443-cfd940efdb45/resourceGroups/demo/providers/Microsoft.Synapse/workspaces/synapseai/bigDataPools/SparkPool1",
+				"name": "SparkPool1",
+				"type": "Spark",
+				"endpoint": "https://synapseai.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool1",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "2.4",
+				"nodeCount": 3,
+				"cores": 8,
+				"memory": 56
+			}
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"%%pyspark\r\n",
+					"data_path = spark.read.load('abfss://wesynapsefs@wesynapseadls.dfs.core.windows.net/netatmo/309503a6-4f8c-4495-80a7-f9232b0f07c2.json', format='json')\r\n",
+					"data_path.show(100)"
+				],
+				"attachments": null,
+				"execution_count": 3
+			}
+		]
+	}
+}

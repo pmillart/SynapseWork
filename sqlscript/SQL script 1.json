@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "SELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.blob.core.windows.net/wesynapsefs/synapse/workspaces/synapseai/warehouse/full_dataset/part-00000-0b991dc6-e3d9-4f3d-989a-0ce2201ab94d-c000.snappy.parquet',\n        FORMAT='PARQUET'\n    ) AS [r]\nWHERE BRAND = 'shiseido'\n    AND CAST(PRICE as DECIMAL) < 30;\n\n\nDECLARE @json NVARCHAR(MAX)\n\nSET @json='{\"name\":\"John\",\"surname\":\"Doe\",\"age\":45,\"skills\":[\"SQL\",\"C#\",\"MVC\"]}';\n\nSELECT *\nFROM OPENJSON(@json);",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "Built-in",
+				"databaseName": "master"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"name": "SQL script 3",
+	"properties": {
+		"content": {
+			"query": "-- Read multiple parquet files with same schema\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/synapseai/warehouse/full_dataset/*.parquet',\n        FORMAT = 'Parquet'\n    ) AS [r]\nWHERE\n    r.filepath() in (\n        'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/synapseai/warehouse/full_dataset/part-00003-e0708fa3-0de6-4167-9b6c-2d844a24d95e-c000.snappy.parquet',\n\t\t'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/synapseai/warehouse/full_dataset/part-00004-e7ab0fed-cf25-4e5d-8826-e7ff563d758f-c000.snappy.parquet',\n\t\t'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/synapseai/warehouse/full_dataset/part-00005-95527ea3-60ec-4ed9-851c-c44d74f08800-c000.snappy.parquet'\n    )\nand product_id = '3600231'\norder by event_time\n\n\nSELECT\n    *\nFROM\nOPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/jsonbook/book.json',\n        FORMAT='CSV',\n        FIELDTERMINATOR ='0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        jsonContent varchar(8000)\n    ) AS [r];\n\nSELECT\n    JSON_VALUE(jsonContent, '$.title') AS title,\n    JSON_VALUE(jsonContent, '$.publisher') as publisher,\n    jsonContent\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/jsonbook/book.json',\n\n        FORMAT='CSV',\n        FIELDTERMINATOR ='0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        jsonContent varchar(8000)\n    ) AS [r]\nWHERE\n    JSON_VALUE(jsonContent, '$.title') = 'Probabilistic and Statistical Methods in Cryptology, An Introduction by Selected Topics';\n\n\n\n\nSELECT\n    JSON_QUERY(jsonContent, '$.authors') AS authors,\n    jsonContent\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/jsonbook/book.json',\n        DATA_SOURCE = 'SqlOnDemandDemo',\n        FORMAT='CSV',\n        FIELDTERMINATOR ='0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        jsonContent varchar(8000)\n    ) AS [r]\nWHERE\n    JSON_VALUE(jsonContent, '$.title') = 'Probabilistic and Statistical Methods in Cryptology, An Introduction by Selected Topics';\n\n\nSELECT\n    --JSON_QUERY(jsonContent, '$.authors') AS authors,\n    jsonContent\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/synapse/workspaces/test_array.json',\n        FORMAT='csv',\n        FIELDTERMINATOR ='0x0A',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0A'\n    )\n    WITH (\n        jsonContent varchar(8000)\n    ) AS [r]\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"name": "master",
+				"type": "SqlOnDemand"
+			}
+		},
+		"type": "SqlQuery"
+	}
+}

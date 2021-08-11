@@ -1,0 +1,16 @@
+{
+	"name": "03_create_product_detail_table",
+	"properties": {
+		"content": {
+			"query": "-- Copyright (c) Microsoft Corporation. All rights reserved.\n-- Licensed under the MIT License.\n\n-- Choose the SQL Pool that you provisioned for this workspace and choose the database that is not master\n-- You will need to switch \"<synapse-studio-name>\" with the name of the Synapse Analytics account name that you chose during deployment\nCREATE EXTERNAL TABLE product_detail \n(\n[id] varchar(8000),\n[productID] varchar(8000),\n[productCategory] varchar(8000),\n[brand] varchar(8000),\n[name] varchar(8000),\n[price] float,\n[imageURL] varchar(8000),\n[description] varchar(8000),\n[updated_ts] datetime\n)\nWITH\n(\n LOCATION = 'synapse/workspaces/<synapse-studio-name>/warehouse/retailaidb.db/product_detail/', \n DATA_SOURCE = retailaidl, \n FILE_FORMAT = parquetformat\n)",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"name": "master",
+				"type": "SqlOnDemand"
+			}
+		},
+		"type": "SqlQuery"
+	}
+}

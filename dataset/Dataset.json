@@ -1,0 +1,252 @@
+{
+	"name": "Dataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "synapseai-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "309503a6-4f8c-4495-80a7-f9232b0f07c2.json",
+				"folderPath": "netatmo",
+				"fileSystem": "wesynapsefs"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"user": {
+					"type": "object",
+					"properties": {
+						"mail": {
+							"type": "string"
+						},
+						"administrative": {
+							"type": "object",
+							"properties": {
+								"lang": {
+									"type": "string"
+								},
+								"reg_locale": {
+									"type": "string"
+								},
+								"windunit": {
+									"type": "integer"
+								},
+								"feel_like_algo": {
+									"type": "integer"
+								},
+								"pressureunit": {
+									"type": "integer"
+								},
+								"country": {
+									"type": "string"
+								},
+								"unit": {
+									"type": "integer"
+								}
+							}
+						}
+					}
+				},
+				"devices": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"last_setup": {
+								"type": "integer"
+							},
+							"data_type": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"last_upgrade": {
+								"type": "integer"
+							},
+							"firmware": {
+								"type": "integer"
+							},
+							"date_setup": {
+								"type": "integer"
+							},
+							"modules": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"last_setup": {
+											"type": "integer"
+										},
+										"rf_status": {
+											"type": "integer"
+										},
+										"data_type": {
+											"type": "array",
+											"items": {
+												"type": "string"
+											}
+										},
+										"last_message": {
+											"type": "integer"
+										},
+										"firmware": {
+											"type": "integer"
+										},
+										"reachable": {
+											"type": "boolean"
+										},
+										"dashboard_data": {
+											"type": "object",
+											"properties": {
+												"date_min_temp": {
+													"type": "integer"
+												},
+												"Temperature": {
+													"type": "number"
+												},
+												"time_utc": {
+													"type": "integer"
+												},
+												"temp_trend": {
+													"type": "string"
+												},
+												"Humidity": {
+													"type": "integer"
+												},
+												"date_max_temp": {
+													"type": "integer"
+												},
+												"min_temp": {
+													"type": "number"
+												},
+												"max_temp": {
+													"type": "number"
+												}
+											}
+										},
+										"module_name": {
+											"type": "string"
+										},
+										"battery_percent": {
+											"type": "integer"
+										},
+										"_id": {
+											"type": "string"
+										},
+										"type": {
+											"type": "string"
+										},
+										"battery_vp": {
+											"type": "integer"
+										},
+										"last_seen": {
+											"type": "integer"
+										}
+									}
+								}
+							},
+							"co2_calibrating": {
+								"type": "boolean"
+							},
+							"last_status_store": {
+								"type": "integer"
+							},
+							"wifi_status": {
+								"type": "integer"
+							},
+							"reachable": {
+								"type": "boolean"
+							},
+							"place": {
+								"type": "object",
+								"properties": {
+									"timezone": {
+										"type": "string"
+									},
+									"city": {
+										"type": "string"
+									},
+									"altitude": {
+										"type": "integer"
+									},
+									"location": {
+										"type": "array",
+										"items": {
+											"type": "number"
+										}
+									},
+									"country": {
+										"type": "string"
+									}
+								}
+							},
+							"module_name": {
+								"type": "string"
+							},
+							"station_name": {
+								"type": "string"
+							},
+							"_id": {
+								"type": "string"
+							},
+							"type": {
+								"type": "string"
+							},
+							"dashboard_data": {
+								"type": "object",
+								"properties": {
+									"CO2": {
+										"type": "integer"
+									},
+									"Temperature": {
+										"type": "number"
+									},
+									"time_utc": {
+										"type": "integer"
+									},
+									"pressure_trend": {
+										"type": "string"
+									},
+									"temp_trend": {
+										"type": "string"
+									},
+									"Humidity": {
+										"type": "integer"
+									},
+									"Pressure": {
+										"type": "number"
+									},
+									"Noise": {
+										"type": "integer"
+									},
+									"AbsolutePressure": {
+										"type": "number"
+									},
+									"date_max_temp": {
+										"type": "integer"
+									},
+									"min_temp": {
+										"type": "number"
+									},
+									"date_min_temp": {
+										"type": "integer"
+									},
+									"max_temp": {
+										"type": "number"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

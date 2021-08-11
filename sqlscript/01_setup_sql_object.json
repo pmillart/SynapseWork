@@ -1,0 +1,16 @@
+{
+	"name": "01_setup_sql_object",
+	"properties": {
+		"content": {
+			"query": "-- Copyright (c) Microsoft Corporation. All rights reserved.\n-- Licensed under the MIT License.\n\n-- Enter in a random string to be used for the password of the MASTER KEY\n-- Run this command using the master database of the SQL Pool that you provisioned\nCREATE MASTER KEY ENCRYPTION BY PASSWORD = '0a79a76a-6bbd-4eab-af1e-ebd54173a541';\nGO\n\n-- This command should be run on the database that is not the master database, so switch to the other database for this command by\n-- going to the \"Use Database\" drop-down in at the top of the window for this SQL Script (not the browser window)\n--\n-- You will need to get the Primary Key of the Azure Data Lake Storage Gen2 Account that is acting as the primary storage for this Synapse workspace\n-- Enter in this value where it says <primary-key-from-adls-gen2>\nCREATE DATABASE SCOPED CREDENTIAL data_lake_primary_key\nWITH IDENTITY = 'user', Secret = '<primary-key-from-adls-gen2>';\n\n-- Create data source\n-- You will need to replace <file-system-name> with the file system name that is being used as the primary filesystem for this workspace\n-- You will need to replace <account-name> with the account name of the ADLS Gen2 that is being used as the primary storage for this workspace\n-- Do not change the name of the Data Source, if you do you will need to change it for the other included SQL Scripts\nCREATE EXTERNAL DATA SOURCE [retailaidl]\nWITH\n(\n\tTYPE = HADOOP,\n\tLOCATION = N'abfss://<file-system-name>@<account-name>.dfs.core.windows.net/', \n\tCREDENTIAL = [data_lake_primary_key]\n);\n\n-- No changes needed here, just highlight and run\nCREATE EXTERNAL FILE FORMAT parquetformat  \nWITH (  \n    FORMAT_TYPE = PARQUET,  \n    DATA_COMPRESSION = 'org.apache.hadoop.io.compress.SnappyCodec'  \n); ",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"name": "master",
+				"type": "SqlOnDemand"
+			}
+		},
+		"type": "SqlQuery"
+	}
+}

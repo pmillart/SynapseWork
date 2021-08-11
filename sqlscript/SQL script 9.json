@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 9",
+	"properties": {
+		"content": {
+			"query": "SELECT \n    json_query(jsonContent, '$.devices[0]') as devices,\n    jsonContent\nFROM\n    OPENROWSET(\n        BULK 'https://wesynapseadls.dfs.core.windows.net/wesynapsefs/netatmo/*.json',\n        FORMAT='CSV',\n        FIELDTERMINATOR ='0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        jsonContent varchar(8000)\n    ) AS [r]\nwhere jsonContent <> 'null';",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "Built-in",
+				"databaseName": "master"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,40 @@
+{
+	"name": "test",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "synapseai-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "test.json",
+				"folderPath": "synapse/workspaces",
+				"fileSystem": "wesynapsefs"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"timestamp": {
+					"type": "string"
+				},
+				"deviceId": {
+					"type": "string"
+				},
+				"messageId": {
+					"type": "string"
+				},
+				"temperature": {
+					"type": "number"
+				},
+				"humidity": {
+					"type": "number"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
