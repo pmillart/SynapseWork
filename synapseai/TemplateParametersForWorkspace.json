@@ -11,6 +11,9 @@
 		"wesynapseadls_connectionString": {
 			"value": ""
 		},
+		"AzureBlobLinked_connectionString": {
+			"value": ""
+		},
 		"synapseai-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://wesynapseadls.dfs.core.windows.net"
 		}
