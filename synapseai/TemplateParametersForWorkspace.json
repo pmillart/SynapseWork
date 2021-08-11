@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "synapseai"
+		},
+		"synapseai-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"wesynapseadls_connectionString": {
+			"value": ""
+		},
+		"synapseai-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://wesynapseadls.dfs.core.windows.net"
+		}
+	}
+}
